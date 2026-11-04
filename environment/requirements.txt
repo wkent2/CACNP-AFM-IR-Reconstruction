@@ -1,0 +1,11 @@
+# Install the appropriate CPU/CUDA PyTorch build for your machine first.
+# Core dependencies; this is not a lockfile of the historical training environment.
+numpy
+scipy
+matplotlib
+torch
+pytorch-lightning
+jupyterlab
+# Optional features: HDF5 loading and TensorBoard logging.
+h5py
+tensorboard
