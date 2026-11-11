@@ -2,7 +2,7 @@
 
 The convolutional-attentive conditional neural process (CACNP) reconstructs AFM-IR hyperspectral cubes from spectra measured at a subset of spatial locations and full-field images acquired at selected wavenumbers (structure images). The pretrained model predicts spectral intensities and voxelwise uncertainty without sample-specific retraining.
 
-This repository provides model training and synthetic-data generation code, a trained checkpoint, two experimental datasets, training-spectrum metadata, and an example notebook for reconstruction and uncertainty calibration. The notebook illustrates use of the method; this release does not include the scripts for generating every manuscript figure or comparison.
+This repository provides model training and synthetic-data generation code, a trained checkpoint, two experimental datasets, training-spectrum metadata, and an example notebook for reconstruction and uncertainty calibration. 
 
 ## Repository contents
 
@@ -29,12 +29,12 @@ Run terminal commands from the repository root. The Python scripts stay together
 | `code/conv_cnp_afmir_prob.py` | CACNP architecture, Lightning training wrapper, training CLI, normalization, cube loading, and basic metrics. |
 | `code/synth_onthefly.py` | Live synthetic generation, measurement artifacts, and context/structure-image selection. |
 | `code/generate_synth_afmir.py` | Underlying morphology generation, spectral assembly, and mixing routines. |
-| `models/model_weights.ckpt` | Pretrained checkpoint used by the example. |
+| `models/model_weights.ckpt` | Pretrained checkpoint used by the example and in the published work. |
 | `example_reconstruction_multi_particle.ipynb` | Sparse reconstruction, held-out-context uncertainty calibration, image comparisons, and spectral comparisons. |
-| `data/experimental/` | Single- and multi-particle AFM-IR cubes, spectral axes, and associated scanning-probe images. |
+| `data/experimental/` | Experimental single- and multi-particle AFM-IR cubes, spectral axes, and associated AFM images. |
 | `data/DATA_README.txt` | Experimental-data description and acquisition information. |
 | `data/metadata/spectral_corpus_metadata.csv` | Compound identifiers, spectrum sources, and processing metadata associated with the training spectral corpus. |
-| `environment/requirements.txt` | Python dependency list (not an exact training-environment lockfile). |
+| `environment/requirements.txt` | Python dependency list.  |
 | `environment/CACNP_env.txt` | Linux environment export supplied as a record of package versions. |
 
 The three Python modules above contain the project code needed for training and inference; separate `anp_afmir.py` and `cnp_afmir.py` modules are not required. The main classes are `CACNP` and `CACNPLightningModule`. Compatibility aliases for older ConvCNP names remain available.
@@ -133,16 +133,6 @@ The CLI defaults select the published training configuration. Inspect available 
 ```bash
 python code/conv_cnp_afmir_prob.py --help
 ```
-
-Key settings are:
-
-- 128 × 128 synthetic cubes with 2–4 phases and dispersed/Voronoi morphologies.
-- Edge-distance depth mixing with edge fraction 0–1 and decay length 0–10 pixels; zero lateral boundary width.
-- Spatial texture, scratches, and Gaussian detector noise with standard deviation 0.01–0.08 in normalized units.
-- Uniformly sampled context positions, with a truncated log-normal context count of 4–4000; 1–4 variance-selected structure images.
-- Context z-score normalization, nearest-neighbor filling, a U-net, and cross-attention to measured spectra.
-- Gaussian negative log-likelihood with context uncertainty, target MSE, structure-image gradient, whole-cube gradient, and total-variation penalties. Their additional weights are 0.1, 1.0, 0.5, 0.2, and 0.02, respectively.
-- AdamW with learning rate 0.0003, weight decay 0.00001, five warmup epochs, and cosine decay; batch size 4, 2000 tasks per epoch, up to 800 epochs, and early-stopping patience 40.
 
 The published run used an NVIDIA A100, seven data workers, 32-bit precision, and seed 42, with validation seeded separately. Worker count contributes to the synthetic-data sequence. Exact replication of the original training run additionally depends on the original numerical corpus and software/hardware environment. Loading the supplied checkpoint uses its saved model hyperparameters.
 
